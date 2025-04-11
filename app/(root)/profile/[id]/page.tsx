@@ -9,7 +9,7 @@ import ThreadTab from "@/components/shared/ThreadTab";
 
 async function Page({ params }: { params: { id: string } }) {
   const user = await currentUser();
-  const { id } = await params;
+  const { id } = params;
 
   if (!user) return null;
   const userInfo = await fetchUser(id);
