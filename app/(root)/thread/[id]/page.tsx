@@ -4,9 +4,13 @@ import { fetchThreadById } from "@/lib/actions/thread.action";
 import { fetchUser } from "@/lib/actions/user.action";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-
-const Page = async ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+const Page = async ({ params }: PageProps) => {
+  const { id } = await params;
   if (!id) return null;
 
   const user = await currentUser();
@@ -15,7 +19,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
   // if (!userInfo) return null;
   if (!userInfo || !userInfo.onBoard) redirect("/onboarding");
 
-  const thread = await fetchThreadById(params.id);
+  const thread = await fetchThreadById(id);
   if (!thread) return redirect("/");
   console.log("thread", thread);
   return (
@@ -32,10 +36,14 @@ const Page = async ({ params }: { params: { id: string } }) => {
       />
 
       <div className="mt-7">
-        <Comment threadId={JSON.stringify(thread._id)} currentUserImg={userInfo?.image} currentUserId={JSON.stringify(userInfo._id)}/>
+        <Comment
+          threadId={JSON.stringify(thread._id)}
+          currentUserImg={userInfo?.image}
+          currentUserId={JSON.stringify(userInfo._id)}
+        />
       </div>
       <div className="mt-10">
-        {thread.children.map((comment:any) => (
+        {thread.children.map((comment: any) => (
           <ThreadCard
             key={comment._id}
             id={comment._id}
