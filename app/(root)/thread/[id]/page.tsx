@@ -37,9 +37,9 @@ const Page = async ({ params }: PageProps) => {
 
       <div className="mt-7">
         <Comment
-          threadId={JSON.stringify(thread._id)}
+          threadId={JSON.stringify(thread?._id)}
           currentUserImg={userInfo?.image}
-          currentUserId={JSON.stringify(userInfo._id)}
+          currentUserId={JSON.stringify(userInfo?._id)}
         />
       </div>
       <div className="mt-10">

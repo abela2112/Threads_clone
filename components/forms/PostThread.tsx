@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useOrganization } from "@clerk/nextjs";
 import { Textarea } from "../ui/textarea";
 import { createThread } from "@/lib/actions/thread.action";
 
@@ -23,6 +24,7 @@ const PostThread = ({ userId }: Props) => {
   //   const [files, setFiles] = React.useState<File[]>([]); // State to hold the uploaded files
   //   const { startUpload } = useUploadThing("media");
   const router = useRouter();
+  const { organization } = useOrganization(); // Get the organization from Clerk
   const pathname = usePathname(); // Get the current pathname for redirection after update
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
@@ -30,6 +32,7 @@ const PostThread = ({ userId }: Props) => {
       thread: "",
     },
   });
+  console.log("community id", organization);
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
@@ -37,10 +40,11 @@ const PostThread = ({ userId }: Props) => {
       const thread = await createThread({
         text: values.thread,
         authorId: userId,
-        communityId: "",
+        communityId: organization ? organization.id : "",
         path: pathname,
       });
       console.log("thread", thread);
+      console.log("community id", organization);
       router.push("/");
     } catch (error: any) {
       console.log("Error updating user:", error.message);

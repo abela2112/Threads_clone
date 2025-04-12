@@ -7,7 +7,7 @@ async function Page() {
   if (!user) return;
 
   const userInfo = await fetchUser(user?.id);
-  if(userInfo && userInfo?.onBoard) return null; // If the user is already onboarded, redirect to another page or return null
+  if (userInfo && userInfo?.onBoard) return null; // If the user is already onboarded, redirect to another page or return null
   const userData = {
     id: user?.id,
     objectId: userInfo?._id,
@@ -16,8 +16,6 @@ async function Page() {
     image: userInfo?.image || user?.imageUrl,
     bio: userInfo?.bio || "",
   };
-
-  console.log("User Data:", userInfo); // Debugging line to check user data
 
   return (
     <main className="flex flex-col justify-start mx-auto max-w-3xl py-20 px-10">

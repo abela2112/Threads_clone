@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
+import Community from "../models/community.model";
 interface Params {
   text: string;
   authorId: string; // Assuming authorId is the ID of the user creating the thread
@@ -18,21 +19,30 @@ export async function createThread({
 }: Params) {
   try {
     connectToDB(); // Ensure the database connection is established
+    const communityObjectId = communityId
+      ? await Community.findOne({ id: communityId }, { _id: 1 })
+      : "";
+    // if(!communityObjectId) throw new Error("Community not found");
     const createThread = await Thread.create({
       text,
       authorId,
-      communityId: null,
+      communityId: communityObjectId?._id,
     });
     if (!createThread) {
       throw new Error("Failed to create thread");
     }
     const updatedUser = await User.findByIdAndUpdate(
-      authorId ,
+      authorId,
 
       { $push: { threads: createThread._id } }, // Add the thread ID to the user's threads array
       { new: true } // Return the updated user document
     );
     await updatedUser?.save();
+    if (communityObjectId) {
+      await Community.findByIdAndUpdate(communityObjectId._id, {
+        $push: { threads: createThread._id },
+      });
+    }
     revalidatePath(path);
   } catch (error) {
     console.error("Error creating thread:", error);
