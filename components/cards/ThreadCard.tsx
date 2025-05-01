@@ -35,6 +35,9 @@ const ThreadCard = ({
   comments,
   isComment = false,
 }: Props) => {
+  
+    console.log("communityId", communityId);
+  
   return (
     <article
       className={`flex flex-col w-full rounded-2xl ${
@@ -127,6 +130,7 @@ const ThreadCard = ({
           </Link>
         </div>
       )}
+
       {!isComment && communityId && (
         <Link
           href={`/communities/${communityId.id}`}
