@@ -65,6 +65,10 @@ export async function fetchPosts(
         model: "User", // Specify the User model to populate from
       })
       .populate({
+        path: "communityId",
+        model: Community,
+      })
+      .populate({
         path: "children", // Populate the children field with replies
         populate: {
           path: "authorId", // Populate the authorId field of each child thread
@@ -95,6 +99,10 @@ export async function fetchThreadById(id: string) {
         path: "authorId",
         model: "User",
         select: "_id id name image",
+      })
+      .populate({
+        path: "communityId",
+        model: Community,
       })
       .populate({
         path: "children",

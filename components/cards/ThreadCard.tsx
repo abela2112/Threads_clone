@@ -36,7 +36,7 @@ const ThreadCard = ({
   isComment = false,
 }: Props) => {
   
-    console.log("communityId", communityId);
+    
   
   return (
     <article
@@ -142,8 +142,8 @@ const ThreadCard = ({
           </p>
 
           <Image
-            src={(communityId && communityId?.image) || ""}
-            alt={(communityId && communityId?.name) || ""}
+            src={communityId && communityId?.image}
+            alt={communityId && communityId?.name}
             width={14}
             height={14}
             className="ml-1 rounded-full object-cover"

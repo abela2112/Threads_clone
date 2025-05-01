@@ -20,6 +20,7 @@ async function Page({ params }: PageProps) {
   if (!userInfo || !userInfo.onBoard) redirect("/onboarding");
 
   const community = await fetchCommunityDetails(id);
+  if (!community) return <p className="no-result">Community not found</p>;
 
   return (
     <section>
@@ -56,8 +57,8 @@ async function Page({ params }: PageProps) {
           <TabsContent value={"threads"}>
             <ThreadTab
               currentUserId={user.id}
-              accountId={userInfo.id}
-              accountType="User"
+              accountId={community?._id}
+              accountType="Community"
             />
           </TabsContent>
           <TabsContent value={"members"}>
@@ -75,11 +76,11 @@ async function Page({ params }: PageProps) {
             </section>
           </TabsContent>
           <TabsContent value={"requests"}>
-            <ThreadTab
+            {/* <ThreadTab
               currentUserId={user.id}
               accountId={userInfo.id}
               accountType="User"
-            />
+            /> */}
           </TabsContent>
         </Tabs>
       </div>

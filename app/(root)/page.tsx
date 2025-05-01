@@ -5,8 +5,12 @@ import { currentUser } from "@clerk/nextjs/server";
 
 async function Home() {
   const user = await currentUser();
+  if (!user) {
+    console.log("No user is logged in");
+    return <p>Please log in to view the content.</p>;
+  }
   const result = await fetchPosts();
-
+  console.log("result", result);
   return (
     <>
       <h1 className="head-text text-left">Home</h1>
