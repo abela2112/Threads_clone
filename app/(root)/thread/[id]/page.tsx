@@ -32,12 +32,12 @@ export async function generateMetadata({
     openGraph: {
       title: thread.text.slice(0, 50),
       description: thread.text.slice(0, 100),
-      url: `https://yourdomain.com/thread/${thread._id}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/thread/${thread._id}`,
       siteName: "Thread",
       images: [
         {
-          url:
-            thread?.authorId?.image || "https://yourdomain.com/default-og.png",
+          url: thread?.authorId?.image || "/assets/logo.svg",
+          alt: thread.text.slice(0, 50),
           width: 800,
           height: 600,
         },
@@ -49,9 +49,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: thread.text.slice(0, 50),
       description: thread.text.slice(0, 100),
-      images: [
-        thread.authorId?.image || "https://yourdomain.com/default-og.png",
-      ],
+      images: [thread.authorId?.image || "assets/logo.svg"],
     },
   };
 }
