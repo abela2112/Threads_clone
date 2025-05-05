@@ -2,6 +2,10 @@ import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import DeleteThreadButton from "../Buttons/deleteThread";
+import LikeButton from "../Buttons/LikeButton";
+import ShareButton from "../Buttons/shareButton";
+import { console } from "inspector";
 
 type Props = {
   id: string;
@@ -22,6 +26,8 @@ type Props = {
   }[];
 
   isComment?: boolean;
+  isProfile?: boolean;
+  likes: Record<string, boolean>;
 };
 
 const ThreadCard = ({
@@ -34,10 +40,12 @@ const ThreadCard = ({
   createdAt,
   comments,
   isComment = false,
+  isProfile = false,
+  likes,
 }: Props) => {
-  
-    
-  
+  console.log("likes", likes);
+  const likeCount = likes ? Object.values(likes).filter(Boolean).length : 0;
+  console.log("likeCount", likeCount);
   return (
     <article
       className={`flex flex-col w-full rounded-2xl ${
@@ -69,13 +77,11 @@ const ThreadCard = ({
             <p className="text-sm-regular text-light-2 mt-2">{text}</p>
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
-              <div className="flex gap-3.5">
-                <Image
-                  src={"/assets/heart-gray.svg"}
-                  alt="heart"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
+              <div className="flex gap-3.5 items-center">
+                <LikeButton
+                  threadId={id?.toString()}
+                  threadLikes={likes}
+                  userId={currentUserId}
                 />
                 <Link href={`/thread/${id}`}>
                   <Image
@@ -94,21 +100,27 @@ const ThreadCard = ({
                   height={24}
                   className="cursor-pointer object-contain"
                 />
-                <Image
-                  src={"/assets/share.svg"}
-                  alt="share"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
-                />
+                <ShareButton threadId={id?.toString()} />
               </div>
-              {!isComment && comments.length > 0 && (
-                <p className="mt-2 text-subtle-medium text-gray-1">
-                  {comments.length} repl{comments.length > 1 ? "ies" : "y"}
-                </p>
+              {!isComment && (
+                <div className="flex items-center gap-2">
+                  {likeCount > 0 && (
+                    <p className="mt-2 text-subtle-medium text-gray-1">
+                      {likeCount} {likeCount > 1 ? "likes" : "like"}
+                    </p>
+                  )}
+                  {comments.length > 0 && (
+                    <p className="mt-2 text-subtle-medium text-gray-1">
+                      {comments.length} repl{comments.length > 1 ? "ies" : "y"}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
+          {isProfile && currentUserId === authorId?.id && (
+            <DeleteThreadButton id={id.toString()} />
+          )}
         </div>
       </div>
       {!isComment && comments.length > 0 && (
@@ -123,6 +135,7 @@ const ThreadCard = ({
               className={`${index !== 0 && "-ml-5"} rounded-full object-cover`}
             />
           ))}
+
           <Link href={`/thread/${id}`}>
             <p className="mt-1 text-subtle-medium text-gray-1">
               {comments.length} repl{comments.length > 1 ? "ies" : "y"}

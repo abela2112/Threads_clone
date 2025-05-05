@@ -15,6 +15,7 @@ import { z } from "zod";
 import { useOrganization } from "@clerk/nextjs";
 import { Textarea } from "../ui/textarea";
 import { createThread } from "@/lib/actions/thread.action";
+import { useState } from "react";
 
 type Props = {
   userId: string;
@@ -24,6 +25,7 @@ const PostThread = ({ userId }: Props) => {
   //   const [files, setFiles] = React.useState<File[]>([]); // State to hold the uploaded files
   //   const { startUpload } = useUploadThing("media");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading state
   const { organization } = useOrganization(); // Get the organization from Clerk
   const pathname = usePathname(); // Get the current pathname for redirection after update
   const form = useForm<z.infer<typeof ThreadValidation>>({
@@ -37,6 +39,7 @@ const PostThread = ({ userId }: Props) => {
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
     try {
+      setIsLoading(true); // Set loading state to true
       const thread = await createThread({
         text: values.thread,
         authorId: userId,
@@ -45,8 +48,11 @@ const PostThread = ({ userId }: Props) => {
       });
       console.log("thread", thread);
       console.log("community id", organization);
+      setIsLoading(false); // Reset loading state
+      form.reset(); // Reset the form after submission
       router.push("/");
     } catch (error: any) {
+      setIsLoading(false); // Reset loading state on error
       console.log("Error updating user:", error.message);
     }
   };
@@ -75,7 +81,7 @@ const PostThread = ({ userId }: Props) => {
           )}
         />
 
-        <Button type="submit" className="bg-primary-500">
+        <Button type="submit" disabled={isLoading} className="bg-primary-500">
           Submit
         </Button>
       </form>

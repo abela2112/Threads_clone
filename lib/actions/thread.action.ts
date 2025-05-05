@@ -27,6 +27,7 @@ export async function createThread({
       text,
       authorId,
       communityId: communityObjectId?._id,
+      createdAt: new Date(),
     });
     if (!createThread) {
       throw new Error("Failed to create thread");
@@ -57,7 +58,7 @@ export async function fetchPosts(
     let skipAmount = (pagenumber - 1) * pagesize; // Calculate how many posts to skip based on the page number and page size
     connectToDB(); // Ensure the database connection is established
     const postsQuery = Thread.find({ parentId: { $in: [null, undefined] } }) // Fetch only top-level threads (not replies)
-      .sort({ createdAt: "desc" })
+      .sort({ createdAt: -1 })
       .skip(skipAmount) // Skip the calculated number of posts
       .limit(pagesize) // Limit the number of posts to the page size
       .populate({
@@ -135,7 +136,7 @@ export async function addCommentToThread(
   threadId: string,
   userId: string,
   comment: string,
-  path: string,
+  path: string
 ) {
   try {
     connectToDB(); // Ensure the database connection is established
@@ -152,9 +153,76 @@ export async function addCommentToThread(
     await originalThread.save();
     revalidatePath(path);
   } catch (error) {
-    
     console.error("Error adding comment to thread:", error);
     throw new Error("Error adding comment to thread");
   }
 }
+
+export async function deleteThread(threadId: string, path: string) {
+  try {
+    connectToDB(); // Ensure the database connection is established
+    const thread = await Thread.findById(threadId);
+    if (!thread) throw new Error("Thread not found");
+
+    // Remove the thread from the author's threads array
+    await User.findByIdAndUpdate(thread.authorId, {
+      $pull: { threads: threadId },
+    });
+
+    // Remove the thread from the community's threads array if it exists
+    if (thread.communityId) {
+      await Community.findByIdAndUpdate(thread.communityId, {
+        $pull: { threads: threadId },
+      });
+    }
+    await Thread.findByIdAndDelete(threadId); // Delete the thread from the database
+    // If the thread has children, delete them as well
+    await Thread.deleteMany({ parentId: threadId }); // Delete all comments associated with the thread
+    // Revalidate the path to refresh the data
+    revalidatePath(path);
+  } catch (error) {
+    console.error("Error deleting thread:", error);
+  }
+}
+
+export const likeOrUnlikeThread = async (
+  threadId: string,
+  userId: string,
+  path: string
+) => {
+  try {
+    console.log("Like or unlike thread", threadId, userId);
+
+    connectToDB(); // Ensure the database connection is established
+    const thread = await Thread.findById(threadId);
+    if (!thread) throw new Error("Thread not found");
+
+    const hasLiked = thread?.likes?.get(userId.toString()) || false;
+    console.log("hasLiked", hasLiked);
+    if (hasLiked) {
+      // Unlike
+      thread?.likes?.delete(userId);
+    } else {
+      // Like
+      thread?.likes?.set(userId, true);
+    }
+
+    await thread.save();
+    revalidatePath(path);
+    // Check if the user has liked the thread after the operation
+    const updatedThread = await Thread.findById(threadId);
+    const hasLikedAfter = updatedThread?.likes?.get(userId.toString());
+    console.log(
+      "hasLikedAfter",
+      hasLikedAfter,
+      " updatedThread?.likes",
+      updatedThread
+    );
+    return { success: true, isLiked: !hasLiked };
+  } catch (error) {
+    console.error("Error liking/unliking thread:", error);
+    // throw new Error("Error liking/unliking thread");
+  } // Revalidate the path to refresh the data
+  // return thread;
+};
 

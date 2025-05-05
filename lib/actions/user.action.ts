@@ -20,26 +20,38 @@ export async function updateUser({
   bio,
   image,
   pathname,
-}: UpdateUserParams): Promise<void | Error> {
+}: UpdateUserParams) {
   try {
     await connectToDB(); // Ensure the database connection is established
-
+    console.log("Updating user with ID:", userId);
+    console.log("User details:", { name, username, bio, image, pathname });
     // Find the user by ID and update their details
     const updatedUser = await User.findOneAndUpdate(
       { id: userId },
       { name, username: username.toLowerCase(), bio, image, onBoard: true }, // Set onBoard to true if it's a new user
-      { upsert: true } // Return the updated document
+      { upsert: true, new: true } // Return the updated document
     );
 
     if (!updatedUser) {
       throw new Error("User not found");
     }
-    if (pathname === "/profile/edit") {
-      revalidatePath(pathname); // Revalidate the profile page to reflect changes
+    console.log("User updated successfully:", updatedUser);
+
+    if (pathname.includes("/edit")) {
+      console.log("Revalidating path:", pathname);
+      revalidatePath(pathname);
+      // revalidatePath(`/profile/${userId}`); // Revalidate the profile page to reflect changes
     }
-    return updatedUser;
+    return { success: true, data: updatedUser };
   } catch (error) {
     console.error("Error updating user:", error);
+    // Handle the error appropriately, e.g., log it or return a specific response
+
+    return {
+      success: false,
+      message: "Failed to update user. Please try again later.",
+    };
+    // throw new Error("Failed to update user. Please try again later.");
   }
 }
 
@@ -65,15 +77,21 @@ export async function fetchUserPosts(userId: string) {
     const userPosts = await User.findOne({ id: userId }).populate({
       path: "threads",
       model: "Thread",
-      populate: {
-        path: "children",
-        model: "Thread",
-        populate: {
-          path: "authorId",
-          model: "User",
-          select: "id name image",
+      populate: [
+        {
+          path: "communityId",
+          model: "Community",
         },
-      },
+        {
+          path: "children",
+          model: "Thread",
+          populate: {
+            path: "authorId",
+            model: "User",
+            select: "id name image",
+          },
+        },
+      ],
     });
     return userPosts;
   } catch (error) {

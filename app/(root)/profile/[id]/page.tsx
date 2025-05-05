@@ -24,7 +24,7 @@ async function Page({ params }: PageProps) {
     <section>
       <ProfileHeader
         currentUserId={userId}
-        AccountId={userInfo?._id}
+        AccountId={userInfo?.id}
         name={userInfo?.name}
         username={userInfo?.username}
         image={userInfo?.image}
@@ -55,7 +55,7 @@ async function Page({ params }: PageProps) {
             <TabsContent key={`content-${tab.label}`} value={tab.value}>
               <ThreadTab
                 currentUserId={userId}
-                accountId={userInfo.id}
+                accountId={userInfo?.id}
                 accountType="User"
               />
             </TabsContent>

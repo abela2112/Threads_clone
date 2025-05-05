@@ -41,6 +41,8 @@ async function ThreadTab({ currentUserId, accountId, accountType }: Props) {
           communityId={post.communityId}
           createdAt={post.createdAt}
           comments={post.children}
+          likes={Object.fromEntries(post.likes)}
+          isProfile
         />
       ))}
     </div>

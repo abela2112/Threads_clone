@@ -1,26 +1,24 @@
 "use client";
-import { userSchema } from "@/lib/validationSchema/user";
-import React, { ChangeEvent } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { useUploadThing } from "@/lib/uploadthing";
 import {
   Form,
   FormControl,
-  
   FormField,
   FormItem,
   FormLabel,
-
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import { Textarea } from "../ui/textarea";
-import { isBase64Image } from "@/lib/utils";
 import { updateUser } from "@/lib/actions/user.action";
-import { useRouter, usePathname } from "next/navigation";
+import { useUploadThing } from "@/lib/uploadthing";
+import { isBase64Image } from "@/lib/utils";
+import { userSchema } from "@/lib/validationSchema/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { redirect, usePathname, useRouter } from "next/navigation";
+import React, { ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
   user: {
@@ -37,6 +35,7 @@ type Props = {
 const AccountProfile = ({ user, btnTitle }: Props) => {
   const [files, setFiles] = React.useState<File[]>([]); // State to hold the uploaded files
   const { startUpload } = useUploadThing("media");
+  const [isLoading, setIsLoading] = React.useState(false); // State to manage loading state
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname for redirection after update
   const form = useForm<z.infer<typeof userSchema>>({
@@ -69,39 +68,48 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   };
 
   // 2. Define a submit handler.
-  const  onSubmit= async(values: z.infer<typeof userSchema>)=> {
-   try {
-    console.log("Submitting form with values:", values);
-    const blob = values.profile_photo;
-    const isImageChanged = isBase64Image(blob);
+  const onSubmit = async (values: z.infer<typeof userSchema>) => {
+    try {
+      setIsLoading(true); // Set loading state to true
+      console.log("Submitting form with values:", values);
+      const blob = values?.profile_photo;
+      const isImageChanged = isBase64Image(blob);
 
-    if (isImageChanged) {
-      // If the image is changed, upload it
-      console.log("Image has changed, starting upload...");
-      const imgRes = await startUpload(files);
-      if (imgRes && imgRes[0].ufsUrl) {
-        console.log("Image uploaded successfully:", imgRes[0]);
-        values.profile_photo = imgRes[0].ufsUrl; // Update the profile_photo field with the new URL
+      if (isImageChanged) {
+        // If the image is changed, upload it
+        console.log("Image has changed, starting upload...");
+        const imgRes = await startUpload(files);
+        if (imgRes && imgRes[0]?.ufsUrl) {
+          console.log("Image uploaded successfully:", imgRes[0]);
+          values.profile_photo = imgRes[0]?.ufsUrl; // Update the profile_photo field with the new URL
+        }
       }
-    }
+      console.log("Updating user with values:->", values);
 
-    const updatedUser = await updateUser({
-      userId: user.id,
-      name: values.name,
-      username: values.username,
-      bio: values.bio,
-      image: values.profile_photo,
-      pathname,
-    });
-    if (pathname === "profile/edit" && updatedUser) {
-      router.back();
-    } else {
-      router.push("/");
+      const updatedUser = await updateUser({
+        userId: user.id,
+        name: values.name,
+        username: values.username,
+        bio: values.bio,
+        image: values.profile_photo,
+        pathname,
+      });
+      setIsLoading(false); // Reset loading state
+
+      console.log("User updated successfully:", updatedUser);
+
+      if (pathname.includes("/edit") && updatedUser.success) {
+        console.log("Redirecting to profile page...");
+        router.back();
+      } else {
+        router.push("/");
+      }
+      // redirect("/"); // Redirect to the home page after successful update
+    } catch (error: any) {
+      setIsLoading(false); // Reset loading state on error
+      console.log("Error updating user:", error.message);
     }
-   } catch (error:any) {
-    console.log("Error updating user:", error.message);
-   }
-  }
+  };
   return (
     <Form {...form}>
       <form
@@ -191,6 +199,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Textarea
                   rows={10}
+                  placeholder="Write your bio"
                   className="account-form_input no-focus"
                   {...field}
                 />
@@ -199,8 +208,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
           )}
         />
 
-        <Button type="submit" className="bg-primary-500">
-          Submit
+        <Button
+          type="submit"
+          className="bg-primary-500 cursor-pointer"
+          disabled={isLoading}
+        >
+          {btnTitle || "Update"}
         </Button>
       </form>
     </Form>

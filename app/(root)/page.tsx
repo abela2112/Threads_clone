@@ -30,6 +30,7 @@ async function Home() {
                 communityId={post.communityId}
                 createdAt={post.createdAt}
                 comments={post.children}
+                likes={Object?.fromEntries(post.likes)}
               />
             ))}
           </>
