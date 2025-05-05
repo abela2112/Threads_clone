@@ -10,12 +10,9 @@ interface PageProps {
     id: string;
   }>;
 }
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const thread = await fetchThreadById(params?.id);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const thread = await fetchThreadById(id);
 
   if (!thread) {
     return {
