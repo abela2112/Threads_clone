@@ -35,7 +35,7 @@ const Page = async ({
     <section>
       <h1 className="head-text mb-10">Communities</h1>
       <Searchbar routerType="communities" />
-      <div className="mt-14 flex-wrap gap-9">
+      <div className="mt-14 flex flex-wrap gap-4">
         {result?.communities.length === 0 ? (
           <p className="no result">No communities found</p>
         ) : (
