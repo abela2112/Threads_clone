@@ -11,11 +11,11 @@ async function Page() {
   if (userInfo && userInfo?.onBoard) redirect("/"); // If the user is already onboarded, redirect to another page or return null
   const userData = {
     id: user?.id,
-    objectId: userInfo?._id,
-    name: userInfo?.name || user?.firstName,
-    username: userInfo?.username || user?.username,
-    image: userInfo?.image || user?.imageUrl,
-    bio: userInfo?.bio || "",
+    objectId: userInfo && userInfo?._id,
+    name: userInfo ? userInfo?.name : user?.firstName,
+    username: userInfo ? userInfo?.username : user?.username,
+    image: userInfo ? userInfo?.image : user?.imageUrl,
+    bio: userInfo ? userInfo?.bio : "",
   };
 
   return (

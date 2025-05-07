@@ -46,8 +46,7 @@ const PostThread = ({ userId }: Props) => {
         communityId: organization ? organization.id : "",
         path: pathname,
       });
-      console.log("thread", thread);
-      console.log("community id", organization);
+
       setIsLoading(false); // Reset loading state
       form.reset(); // Reset the form after submission
       router.push("/");
