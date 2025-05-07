@@ -25,12 +25,12 @@ A modern social media application built with Next.js 15, inspired by Threads. Th
 
 ![Home Page]![image](https://github.com/user-attachments/assets/a5f4ce6d-82f9-4092-9c5f-4d71fced6c40)
 
-![Profile Page](![image](https://github.com/user-attachments/assets/5cf8f484-4e56-4180-8473-93e557de5eb8)
-)
-![Thread Detail](![image](https://github.com/user-attachments/assets/dbb93d86-4608-49b6-9150-8e5e0d7b33ba)
-)
-![Communities](![image](https://github.com/user-attachments/assets/bab8298b-5d5e-41e6-8617-8d9074a2aedb)
-)
+![Profile Page]![image](https://github.com/user-attachments/assets/5cf8f484-4e56-4180-8473-93e557de5eb8)
+
+![Thread Detail]![image](https://github.com/user-attachments/assets/dbb93d86-4608-49b6-9150-8e5e0d7b33ba)
+
+![Communities]![image](https://github.com/user-attachments/assets/bab8298b-5d5e-41e6-8617-8d9074a2aedb)
+
 
 *Replace these placeholder images with actual screenshots of your application*
 
