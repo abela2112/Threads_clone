@@ -7,6 +7,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { Toaster } from "react-hot-toast";
+import { Suspense } from "react";
+import Loading from "./Loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,14 +47,17 @@ export default function RootLayout({
               },
             }}
           />
-          <Topbar />
-          <main className="flex flex-row">
-            <LeftSidebar />
-            <section className="main-container">
-              <div className="w-full max-w-4xl">{children}</div>
-            </section>
-            <RightSidebar />
-          </main>
+
+          <Suspense fallback={<Loading />}>
+            <Topbar />
+            <main className="flex flex-row">
+              <LeftSidebar />
+              <section className="main-container">
+                <div className="w-full max-w-4xl">{children}</div>
+              </section>
+              <RightSidebar />
+            </main>
+          </Suspense>
           <Bottombar />
         </body>
       </html>

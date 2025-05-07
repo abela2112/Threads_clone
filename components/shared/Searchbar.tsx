@@ -15,7 +15,7 @@ const Searchbar = ({ routerType }: { routerType: string }) => {
         router.push(`/${routerType}`);
       }
       return () => clearTimeout(delayDebounceFn);
-    }, 300);
+    }, 200);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm, routerType]);
   return <section className="searchbar">

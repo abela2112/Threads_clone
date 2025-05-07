@@ -124,6 +124,24 @@
   .topbar {
     @apply fixed top-0 z-30 flex w-full items-center justify-between bg-dark-2 px-6 py-3;
   }
+  .custom-loader {
+    width:90px;
+    height:80px;
+    --c:linear-gradient(#6A7BF4 0 0);
+    background: 
+      var(--c) 0%   100%,
+      var(--c) 50%  100%,
+      var(--c) 100% 100%;
+    background-size:18px 100%;
+    background-repeat: no-repeat;
+    animation:b2 1s infinite linear;
+  }
+  @keyframes b2 {
+      20% {background-size:18px 60% ,18px 100%,18px 100%}
+      40% {background-size:18px 80% ,18px 60% ,18px 100%}
+      60% {background-size:18px 100%,18px 80% ,18px 60% }
+      80% {background-size:18px 100%,18px 100%,18px 80% }
+  }
 
   .bottombar {
     @apply fixed flex bottom-0 z-10 w-full rounded-t-3xl bg-glassmorphism p-4 backdrop-blur-lg xs:px-7 md:hidden;
