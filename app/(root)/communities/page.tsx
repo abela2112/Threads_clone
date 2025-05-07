@@ -1,4 +1,5 @@
 import CommunityCard from "@/components/cards/CommunityCard";
+import Pagination from "@/components/shared/Pagination";
 import Searchbar from "@/components/shared/Searchbar";
 import { fetchCommunities } from "@/lib/actions/community.action";
 import { fetchUser } from "@/lib/actions/user.action";
@@ -26,11 +27,10 @@ const Page = async ({
 
   const result = await fetchCommunities({
     searchString: searchProps?.q as string,
-    pageNumber: 1,
+    pageNumber: searchProps?.page ? Number(searchProps?.page) : 1,
     pageSize: 20,
   });
-  // console.log("result", result);
-  // return (<h1>hello world</h1>);
+
   return (
     <section>
       <h1 className="head-text mb-10">Communities</h1>
@@ -59,6 +59,11 @@ const Page = async ({
           </>
         )}
       </div>
+      <Pagination
+        pageNumber={searchProps?.page ? +Number(searchProps?.page) : 1}
+        isNext={result?.isNext ?? false}
+        path="communities"
+      />
     </section>
   );
 };
